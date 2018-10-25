@@ -10,13 +10,18 @@ var jsonfile = require('jsonfile');
 var path = require('path');
 var stat = fs.statSync;
 
-/*
-生成文件夹函数
- */
+ // 定义当前版本
+ program
+ .version(require('../package').version )
+
+// 定义使用方法
+program
+    .usage('<command>')
 
 program
     .command('initvue')
-    .description('run the given remote command')
+    .description('Generate multi page development about vue-cli')
+    .alias('iv')
     .action(function () {
         require('./command/initvue')()
     });

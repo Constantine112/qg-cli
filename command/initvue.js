@@ -114,6 +114,7 @@ var defaultConf = {
         "not ie <= 8"
     ]
 }
+
 /**
  * 
  * @param {object} params {这个对象用于存放init的时候的用户输入的信息} 
@@ -183,35 +184,54 @@ function createVue(params) {
                         console.log(error)
                         process.exit(0)
                     }
+
+                     //退出程序
                     process.exit(0)
                 })
             })
         })
 
-        //退出程序
+       
         
     })
 }
+
+/**
+ * fileTemplate 用于合并对象模板创建package.json
+ * @param {object} params {这个对象用于存放init的时候的用户输入的信息} 
+ * 
+ */
 function fileTemplate(params) {
     return Object.assign(defaultConf, params);
 }
 
+/**
+ * 创建文件函数
+ * @param {string} to {用于标注文件需要创建的位置} 
+ */
 function createFile (to) { //文件写入
     fs.readFileSync(to);
 };
 
+/**
+ * @description 用于创建文件夹
+ *  
+ * @param {string} position {用于标注文件夹需要创建的位置}
+ */
 function createFolder (position)  {
-    // fs.mkdir(position, function (err) {
-    //     if (err) {
-    //         return console.error(err);
-    //     }
-    //     console.log(position + ": 目录创建成功。");
-    // })
     fs.mkdirSync(position);
 };
+
+/**
+ * @description 删除文件夹和删除文件夹下的全部文件
+ * 
+ * @param {string} path {用于标注文件夹需要创建的位置}
+ */
 function deleteall(path) {
     var files = [];
+
     if (fs.existsSync(path)) {
+        //该文件夹存在
         files = fs.readdirSync(path);
         files.forEach(function(file, index) {
             var curPath = path + "/" + file;
@@ -224,14 +244,22 @@ function deleteall(path) {
         fs.rmdirSync(path);
     }
 }
-function copy (src, dst) {
 
+/**
+ * @description 用于复制文件夹
+ * 
+ * @param {string} src  用于复制的目标文件夹
+ * @param {string} dst  用于写入的文件夹路径
+ */
+function copy (src, dst) {
     function copyF (err, paths) { 
         console.log('复制中')
-        console.log(paths)
+        // console.log(paths)
         if(err){
             throw err;
         }
+        
+        //循环判断路径
         paths.forEach( function (path) {
             var _src = src+'/'+path;
             var _dst = dst+'/'+path;
@@ -244,11 +272,15 @@ function copy (src, dst) {
                 }
                 
                 if (st.isFile()) {
+
                     readable = fs.createReadStream(_src);//创建读取流
                     writable = fs.createWriteStream(_dst);//创建写入流
                     readable.pipe(writable);
+
                 }else if (st.isDirectory()) {
+
                     exists(_src, _dst, copy);
+
                 }
             }
             cpyF(null ,stat(_src))
@@ -256,22 +288,17 @@ function copy (src, dst) {
     }
     copyF(null ,fs.readdirSync(src))
 }
-
+/**
+ * @description 用于判断两个文件夹是否存在
+ * 
+ * @param {*} src {用于复制的目标文件夹}
+ * @param {*} dst {用于写入的文件夹路径}
+ * @param {*} callback {回调函数}
+ */
 function exists (src, dst, callback) {
     //测试某个路径下文件是否存在
     console.log('复制中')
-    // fs.exists(dst, function(exists) {
-    //     console.log('复制中')
-    //     if (exists) {//不存在
-    //         callback(src, dst);
-    //     } else {//存在
-    //         fs.mkdir(dst, function() {//创建目录
-    //             callback(src, dst)
-    //         })
-    //     }
-    // })
     function findFolder (exists) {
-        console.log('复制中')
         if (exists) {//不存在
             callback(src, dst);
         } else {//存在
@@ -281,11 +308,12 @@ function exists (src, dst, callback) {
     }
     findFolder(fs.existsSync(dst))
 }
+
 module.exports = () => {
     co(function*() {
         var params = {};
         // params.name = yield prompt('name: (' +  process.env.PWD.split("/").pop() +')');
-        params.name = yield prompt('name: (project-name)');
+        params.name = yield prompt('name: (my-project)');
         params.version = yield prompt('version: (1.0.0)');
         params.description = yield prompt('description: ');
         params.repository = yield prompt('git repository: ');
